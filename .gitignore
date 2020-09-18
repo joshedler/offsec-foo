@@ -1,3 +1,6 @@
+# Project overrides
+local_shortcuts.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
