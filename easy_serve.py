@@ -43,12 +43,19 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 init(autoreset=True)
 
+# try the current directory first
 shorty = Path('local_shortcuts.json')
+if not shorty.exists():
+    shorty = Path(f"{sys.path[0]}/local_shortcuts.json")
 if shorty.exists():
     with open(shorty, 'r') as f:
         user = json.load(f)
-        print(f'{Fore.CYAN+Style.BRIGHT}Loaded {len(user)} user shortcuts from {shorty.name}.')
+        print(f'{Fore.CYAN+Style.BRIGHT}Loaded {len(user)} user shortcuts from {shorty}.')
         SHORTCUTS = {**SHORTCUTS, **user}   # python 3.5+ method to merge two dictionaries
+else:
+    print('No local user shortcuts found.')
+
+print()
 
 adapters = ifaddr.get_adapters()
 
@@ -75,6 +82,18 @@ for port in PORTS:
 if my_server is None:
     print(f"{Fore.RED+Style.BRIGHT}All available ports are in use. Aborting...")
     sys.exit(1)
+
+print()
+print(f"{Fore.CYAN+Style.BRIGHT}Shortcuts:")
+
+for key in SHORTCUTS.keys():
+    scut = Path(f"{SHORTCUTS[key]}/{key}")
+    fore = Fore.RED+Style.BRIGHT
+    if scut.exists():
+        fore = Fore.GREEN+Style.BRIGHT
+
+    print(f"  {fore}{key} : {scut}")
+print()
 
 try:
     # start the server
